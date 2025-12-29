@@ -1,0 +1,8 @@
+# Ignore images
+*.png
+*.jpg
+*.jpeg
+
+# Ignore csv files
+*.csv
+*.DS_Store
