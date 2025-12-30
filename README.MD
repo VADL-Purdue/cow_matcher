@@ -85,7 +85,8 @@ python cow_matcher.py --track "./path/to/track_images" --gt "./path/to/list.csv"
 |`a / d`| Scroll Ground Truth list Up / Down.
 |`i / k`| Tandem Scroll: Moves both Track and GT lists Up/Down simultaneously (caps lock supported).|
 |`t`|Jump to Next Mark (Bookmark).
-|`o`|Jump to Next Auto-Ignore (Flag 4).pJump GT list to the ID matching the Prediction (from filename).
+|`o`|Jump to Next Auto-Ignore (Flag 4).
+|`p`|Jump GT list to the ID matching the Prediction (from filename).
 |`f`|Find Cow: Jumps GT list to the Cow ID currently assigned to the selected Track.
 |`g`|Find Track: Jumps Track list to the ID currently assigned to the selected GT row.
 

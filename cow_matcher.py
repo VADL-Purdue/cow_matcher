@@ -52,7 +52,7 @@ def apply_global_transforms(img):
     """Applies global rotation and flipping to the image."""
     if img is None: return None
     
-    # 1. 旋转
+    # 1. Rotate
     if GLOBAL_ROTATE_DEG == 90:
         img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
     elif GLOBAL_ROTATE_DEG == 180:
@@ -60,9 +60,9 @@ def apply_global_transforms(img):
     elif GLOBAL_ROTATE_DEG == 270:
         img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
         
-    # 2. 翻转
+    # 2. Flip
     if GLOBAL_FLIP_HORIZ:
-        img = cv2.flip(img, 1) # 1 表示水平翻转, 0 是垂直, -1 是双向
+        img = cv2.flip(img, 1) # 1 horizontal, 0 vertical, -1 dual
         
     return img
 
@@ -126,11 +126,10 @@ def create_text_cell(text, width=TEXT_CELL_W, height=CELL_H, color_code=CLR_WHIT
     bg_color = color_code
     alpha = 0.3
     
-    # Priority: If Marked, override background to Light Purple (unless it has a strong status color, allow blend?)
-    # Let's make "Marked" tint the background distinctively.
-    if is_marked:
-        bg_color = CLR_MARK_BG
-        alpha = 0.5 # Slightly stronger for mark
+    # Priority: If Marked, override background to Light Purple
+    # if is_marked:
+    #     bg_color = CLR_MARK_BG
+    #     alpha = 0.5 # Slightly stronger for mark
     
     # 3. Apply Semi-Transparent Background
     if bg_color != CLR_WHITE:
@@ -234,7 +233,7 @@ def build_sidebar(canvas_height, compact_mode, track_df, gt_df):
         (" g: Find Track", CLR_BLACK),
         (" q: Save & Quit", CLR_BLACK),
         ("---------------------", CLR_GRAY),
-        ("Version: 1.10", CLR_GRAY),
+        ("Version: 1.11", CLR_GRAY),
     ]
 
     width = 230 
@@ -694,16 +693,10 @@ while True:
         if pd.notna(track_df.at[cur_track_idx, "assignedCowID"]):
              print(f"[BLOCK] Track already assigned. Cancel first.")
         else:
-            # *** BUG FIX: Recalc Ignore Counter here too ***
             ignore_counter = recalc_ignore_counter(track_df, gt_df)
             
             track_df.at[cur_track_idx, "assignedCowID"] = f"ignore_{ignore_counter}"
             track_df.at[cur_track_idx, "flag"] = "3"
-            
-            # (Optional) If it was marked as correct, maybe we should unmark it?
-            # Keeping mark logic independent as per instruction unless implied otherwise.
-            # But usually ignore implies "Not Correct". 
-            # If user explicitly wants to restore 0, they can use 'r'.
             
             ignore_counter += 1
             cur_track_idx = min(cur_track_idx + 1, total_tracks - 1)
