@@ -16,6 +16,8 @@ Cow Matcher is a GUI tool designed to manually and semi-automatically align sequ
 
 - Global Transformations: Supports rotating and mirroring input images via configuration.
 
+![demo](GUI.gif)
+
 ## File & Naming Requirements
 To run the tool, your data must follow specific naming conventions.
 
