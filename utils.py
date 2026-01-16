@@ -99,7 +99,7 @@ def extract_ignore_number(val):
 
 def recalc_ignore_counter(track_df, gt_df, GT_ID_IDX):
     """Scans both dataframes to find the current maximum ignore_N."""
-    max_ign_track = track_df["assignedCowID"].apply(extract_ignore_number).max()
+    max_ign_track = track_df["cowID"].apply(extract_ignore_number).max()
     if pd.isna(max_ign_track): max_ign_track = 0
 
     gt_id_col = gt_df.columns[GT_ID_IDX]
@@ -184,7 +184,7 @@ def prepare_display_img(img, text, border_color=CLR_WHITE, outer_border_color=No
 def build_sidebar(canvas_height, compact_mode, track_df, gt_df):
     clean_flags = track_df["flag"].apply(clean_format)
     total_tracks = len(track_df)
-    auto_assigned = track_df["assignedCowID"].notnull().sum()
+    auto_assigned = track_df["cowID"].notnull().sum()
     
     n_match  = (clean_flags == "1").sum()
     n_fill   = (clean_flags == "2").sum()
@@ -260,7 +260,7 @@ def get_row_cells(idx, is_track, track_df, gt_df, compact_mode, gt_subfolders, t
     if is_track:
         if 0 <= idx < len(track_df):
             row = track_df.iloc[idx]
-            mid = clean_format(row["assignedCowID"])
+            mid = clean_format(row["cowID"])
             pid = clean_format(row["pred_cow_id"])
             flag = clean_format(row["flag"])
             color_code = get_color_by_flag(flag)

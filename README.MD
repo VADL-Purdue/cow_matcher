@@ -100,7 +100,7 @@ Contains the tracking data merged with your manual assignments.
 |Column	|Description|
 |-----:|---------------------------|
 |track_id	|Original ID from the image filename.|
-|assignedCowID|	The Cow ID you assigned (or ignore_N).|
+|cowID|	The Cow ID you assigned (or ignore_N).|
 |flag	|Status code indicating how the assignment was made (see below).|
 |mark	|1 if the row is bookmarked, 0 otherwise.|
 |pred_cow_id	|The prediction extracted from the filename.|

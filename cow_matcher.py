@@ -68,12 +68,12 @@ if os.path.exists(track_save_csv):
         saved_df["track_id"] = saved_df["track_id"].apply(lambda x: int(float(x)) if pd.notna(x) else 0)
     
     # Merge existing columns
-    cols_to_merge = [c for c in ["track_id", "assignedCowID", "flag", "mark"] if c in saved_df.columns]
+    cols_to_merge = [c for c in ["track_id", "cowID", "flag", "mark"] if c in saved_df.columns]
     track_df = pd.merge(base_df, saved_df[cols_to_merge], on="track_id", how="left")
 else:
     print("[Info] Starting fresh Track log...")
     track_df = base_df
-    track_df["assignedCowID"] = None
+    track_df["cowID"] = None
     track_df["flag"] = None
     track_df["mark"] = 0
 
@@ -136,7 +136,7 @@ if missing_mask.any():
     gt_df.to_csv(gt_save_csv, index=False)
 
 # Ensure correct data types
-track_df["assignedCowID"] = track_df["assignedCowID"].astype("object")
+track_df["cowID"] = track_df["cowID"].astype("object")
 track_df["flag"] = track_df["flag"].astype("object")
 gt_df["assignedTrackID"] = gt_df["assignedTrackID"].astype("object")
 gt_df["flag"] = gt_df["flag"].astype("object")
@@ -148,7 +148,7 @@ gt_df["flag"] = gt_df["flag"].astype("object")
 total_tracks = len(track_df)
 total_gt = len(gt_df)
 
-last_auto = track_df["assignedCowID"].last_valid_index()
+last_auto = track_df["cowID"].last_valid_index()
 cur_track_idx = last_auto + 1 if last_auto is not None else 0
 
 last_gt = gt_df["assignedTrackID"].last_valid_index()
@@ -191,7 +191,7 @@ while True:
         if cur_gt_index >= total_gt: continue
         
         gt_assigned = clean_format(gt_df.at[cur_gt_index, "assignedTrackID"])
-        track_assigned = clean_format(track_df.at[cur_track_idx, "assignedCowID"])
+        track_assigned = clean_format(track_df.at[cur_track_idx, "cowID"])
         
         if gt_assigned:
             print(f"[BLOCK] GT Cow {cow_id} already assigned to Track {gt_assigned}. Cancel ('x') first.")
@@ -200,7 +200,7 @@ while True:
             print(f"[BLOCK] Current Track {track_id} already assigned to {track_assigned}. Cancel ('x') first.")
             continue
 
-        track_df.at[cur_track_idx, "assignedCowID"] = cow_id
+        track_df.at[cur_track_idx, "cowID"] = cow_id
         track_df.at[cur_track_idx, "flag"] = "1"
         gt_df.at[cur_gt_index, "assignedTrackID"] = track_id
         gt_df.at[cur_gt_index, "flag"] = "1" 
@@ -223,7 +223,7 @@ while True:
             gt_df.loc[gt_mask, "flag"] = None
             
             track_mask = track_df["flag"].apply(clean_format).isin(["2", "4", "2.0", "4.0"])
-            track_df.loc[track_mask, "assignedCowID"] = None
+            track_df.loc[track_mask, "cowID"] = None
             track_df.loc[track_mask, "flag"] = None
             print("[Auto] Cleared.")
         else:
@@ -245,8 +245,8 @@ while True:
                     targets = [x for x in track_range_idx if pd.isna(track_df.at[x, "flag"])]
                     if not targets: continue
                     
-                    c_start = clean_format(track_df.at[s,"assignedCowID"])
-                    c_end = clean_format(track_df.at[e,"assignedCowID"])
+                    c_start = clean_format(track_df.at[s,"cowID"])
+                    c_end = clean_format(track_df.at[e,"cowID"])
                     
                     gt_str_ids = gt_df.iloc[:, GT_ID_IDX].apply(clean_format)
                     g_s_list = gt_df.index[gt_str_ids == c_start].tolist()
@@ -270,7 +270,7 @@ while True:
                                 gt_cid = clean_format(gt_df.iloc[gt_idx, GT_ID_IDX])
                                 a_tid  = track_df.iloc[a_idx]["track_id"]
                                 
-                                track_df.at[a_idx, "assignedCowID"] = gt_cid
+                                track_df.at[a_idx, "cowID"] = gt_cid
                                 track_df.at[a_idx, "flag"] = "2"
                                 gt_df.at[gt_idx, "assignedTrackID"] = a_tid
                                 gt_df.at[gt_idx, "flag"] = "2"
@@ -278,14 +278,14 @@ while True:
             print(f"   -> Interpolated {filled_count} rows (Orange).")
 
             # Phase B: Fill Remaining with Ignore
-            empty_mask = track_df["assignedCowID"].isna() | (track_df["assignedCowID"] == "")
+            empty_mask = track_df["cowID"].isna() | (track_df["cowID"] == "")
             empty_indices = track_df.index[empty_mask].tolist()
             
             ignore_filled_count = 0
             for idx in empty_indices:
                 ign_val = f"ignore_{ignore_counter}"
 
-                track_df.at[idx, "assignedCowID"] = ign_val
+                track_df.at[idx, "cowID"] = ign_val
                 track_df.at[idx, "flag"] = "4"
 
                 curr_track_id = track_df.at[idx, "track_id"]
@@ -309,12 +309,12 @@ while True:
 
     # === Key: 3 (MANUAL IGNORE) ===
     elif key == ord('3'):
-        if pd.notna(track_df.at[cur_track_idx, "assignedCowID"]):
+        if pd.notna(track_df.at[cur_track_idx, "cowID"]):
              print(f"[BLOCK] Track already assigned. Cancel first.")
         else:
             ignore_counter = recalc_ignore_counter(track_df, gt_df, GT_ID_IDX)
             
-            track_df.at[cur_track_idx, "assignedCowID"] = f"ignore_{ignore_counter}"
+            track_df.at[cur_track_idx, "cowID"] = f"ignore_{ignore_counter}"
             track_df.at[cur_track_idx, "flag"] = "3"
             
             ignore_counter += 1
@@ -366,7 +366,7 @@ while True:
 
     # === Key: x (CANCEL / CLEAR) ===
     elif key in (ord('x'), ord('X')):
-        assigned_cow = clean_format(track_df.at[cur_track_idx, "assignedCowID"])
+        assigned_cow = clean_format(track_df.at[cur_track_idx, "cowID"])
         flag_val = str(clean_format(track_df.at[cur_track_idx, "flag"]))
         
         if flag_val in ("1", "2") and assigned_cow and not str(assigned_cow).startswith("ignore"):
@@ -379,7 +379,7 @@ while True:
                     gt_df.at[gt_idx, "flag"] = None
                     print(f"[Info] Unassigned GT CowID {assigned_cow} from Track {track_id}.")
 
-        track_df.at[cur_track_idx, "assignedCowID"] = None
+        track_df.at[cur_track_idx, "cowID"] = None
         track_df.at[cur_track_idx, "flag"] = None
 
     # === Tools ===
@@ -401,7 +401,7 @@ while True:
             print("[Warning] No Predicted CowID for current Track.")
 
     elif key in (ord('f'), ord('F')):
-        assigned = clean_format(track_df.at[cur_track_idx, "assignedCowID"])
+        assigned = clean_format(track_df.at[cur_track_idx, "cowID"])
         if assigned and not str(assigned).startswith("ignore"):
             gt_str_ids = gt_df.iloc[:, GT_ID_IDX].apply(clean_format)
             matches = gt_df.index[gt_str_ids == assigned]
