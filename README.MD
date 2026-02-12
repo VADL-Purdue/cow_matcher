@@ -3,7 +3,7 @@
 Author: Haochuan Hu
 
 ## Cow Matcher Tool
-Cow Matcher is a GUI tool designed to manually and semi-automatically align sequential "Track" images (from AutoCattlog algorithm) with "Ground Truth" (GT) identities.
+Cow Matcher is a GUI tool designed to manually and semi-automatically align sequential "Track" images (from the [AutoCattlogger](https://github.com/VADL-Purdue/AutoCattlogger) system) with "Ground Truth" (GT) identities.
 
 ## Features
 - Dual-Pane Interface: View Track images (left) and Ground Truth image banks (right) simultaneously.
